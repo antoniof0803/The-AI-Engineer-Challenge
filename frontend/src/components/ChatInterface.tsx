@@ -30,13 +30,33 @@ const ChatInterface = ({ config, onReconfigure }: ChatInterfaceProps) => {
   useEffect(() => {
     const checkApiHealth = async () => {
       try {
-        const healthUrl = config.apiUrl.replace('/api/chat', '/api/health')
-        const response = await fetch(healthUrl, { method: 'GET' })
-        if (response.ok) {
-          setApiStatus('online')
-        } else {
-          setApiStatus('offline')
+        // Build base URL (remove /chat or /api/chat from the end)
+        const baseUrl = config.apiUrl
+          .replace(/\/api\/chat\/?$/, '')
+          .replace(/\/chat\/?$/, '')
+        
+        // Try multiple health check endpoints
+        const healthUrls = [
+          `${baseUrl}/health`,
+          `${baseUrl}/api/health`
+        ]
+        
+        for (const healthUrl of healthUrls) {
+          try {
+            const response = await fetch(healthUrl, { method: 'GET' })
+            if (response.ok) {
+              const data = await response.json()
+              if (data.status === 'ok') {
+                setApiStatus('online')
+                return
+              }
+            }
+          } catch (err) {
+            continue
+          }
         }
+        
+        setApiStatus('offline')
       } catch (error) {
         setApiStatus('offline')
       }

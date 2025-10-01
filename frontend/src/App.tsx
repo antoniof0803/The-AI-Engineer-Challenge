@@ -14,7 +14,7 @@ function App() {
     apiKey: '',
     model: 'gpt-4o-mini',
     developerMessage: 'You are a helpful AI assistant.',
-    apiUrl: 'http://localhost:8000/api/chat'
+    apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/chat'
   })
 
   const [isConfigured, setIsConfigured] = useState(false)

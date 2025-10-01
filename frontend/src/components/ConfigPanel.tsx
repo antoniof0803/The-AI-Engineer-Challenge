@@ -20,16 +20,41 @@ const ConfigPanel = ({ onSave, initialConfig }: ConfigPanelProps) => {
 
   const validateApiConnection = async (url: string): Promise<boolean> => {
     try {
-      const healthUrl = url.replace('/api/chat', '/api/health')
-      const response = await fetch(healthUrl, { 
-        method: 'GET',
-        signal: AbortSignal.timeout(5000) // 5 second timeout
-      })
+      // Build base URL (remove /chat or /api/chat from the end)
+      const baseUrl = url
+        .replace(/\/api\/chat\/?$/, '')
+        .replace(/\/chat\/?$/, '')
       
-      if (response.ok) {
-        const data = await response.json()
-        return data.status === 'ok'
+      // Try multiple health check endpoints
+      const healthUrls = [
+        `${baseUrl}/health`,
+        `${baseUrl}/api/health`
+      ]
+      
+      console.log('Testing connection to:', healthUrls)
+      
+      // Try each health URL
+      for (const healthUrl of healthUrls) {
+        try {
+          const response = await fetch(healthUrl, { 
+            method: 'GET',
+            signal: AbortSignal.timeout(5000) // 5 second timeout
+          })
+          
+          if (response.ok) {
+            const data = await response.json()
+            if (data.status === 'ok') {
+              console.log('✅ Connection successful:', healthUrl)
+              return true
+            }
+          }
+        } catch (err) {
+          console.log('❌ Failed:', healthUrl, err)
+          // Try next URL
+          continue
+        }
       }
+      
       return false
     } catch (error) {
       console.error('API validation error:', error)

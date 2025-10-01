@@ -61,10 +61,32 @@ async def chat(request: ChatRequest):
         # Handle any errors that occur during processing
         raise HTTPException(status_code=500, detail=str(e))
 
+# Root chat endpoint (for Vercel when deployed from /api folder)
+@app.post("/chat")
+async def chat_root(request: ChatRequest):
+    return await chat(request)
+
 # Define a health check endpoint to verify API status
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok"}
+
+# Root health endpoint (for Vercel when deployed from /api folder)
+@app.get("/health")
+async def health_check_root():
+    return {"status": "ok"}
+
+# Root endpoint for verification
+@app.get("/")
+async def root():
+    return {
+        "message": "OpenAI Chat API",
+        "status": "running",
+        "endpoints": {
+            "health": ["/health", "/api/health"],
+            "chat": ["/chat", "/api/chat"]
+        }
+    }
 
 # Entry point for running the application directly
 if __name__ == "__main__":
