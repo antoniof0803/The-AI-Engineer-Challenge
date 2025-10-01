@@ -1,145 +1,204 @@
-# AI Engineer Challenge - Frontend
+# OpenAI Chat Frontend
 
-A modern React frontend application built with TypeScript, Tailwind CSS, and Vite for the AI Engineer Challenge.
+Una aplicación frontend moderna construida con React, TypeScript y Tailwind CSS que se conecta a la API de chat de OpenAI a través del backend FastAPI.
 
-## Features
+## ✨ Características
 
-- ⚡ **Vite** - Lightning fast development server
-- ⚛️ **React 18** - Latest React with hooks and concurrent features
-- 🔷 **TypeScript** - Type safety and better developer experience
-- 🎨 **Tailwind CSS** - Utility-first CSS framework
-- 🧭 **React Router** - Client-side routing
-- 📱 **Responsive Design** - Mobile-first approach
-- 🎯 **Modern UI** - Clean and professional interface
+- 💬 **Interfaz de Chat en Tiempo Real** - Streaming de respuestas de OpenAI
+- ⚙️ **Configuración Flexible** - Personaliza API key, modelo y mensajes del sistema
+- 🎨 **UI Moderna** - Diseño limpio y responsivo con Tailwind CSS
+- ⚡ **Vite** - Desarrollo rápido con Hot Module Replacement
+- 🔷 **TypeScript** - Type safety completo
+- 🔒 **Seguro** - API key almacenada solo en el navegador
 
-## Tech Stack
+## 🛠️ Stack Tecnológico
 
 - **Framework**: React 18
-- **Language**: TypeScript
+- **Lenguaje**: TypeScript
 - **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Routing**: React Router DOM
-- **Icons**: Lucide React
-- **Linting**: ESLint
+- **Estilos**: Tailwind CSS
+- **Iconos**: Lucide React
+- **API**: Integración con FastAPI backend
 
-## Getting Started
+## 📋 Prerrequisitos
 
-### Prerequisites
+- Node.js (versión 16 o superior)
+- npm o yarn
+- Backend FastAPI corriendo (ver directorio `/api`)
 
-- Node.js (version 16 or higher)
-- npm or yarn
+## 🚀 Instalación
 
-### Installation
-
-1. Navigate to the frontend directory:
+1. Navega al directorio del frontend:
    ```bash
-   cd frontend
+   cd chat-frontend
    ```
 
-2. Install dependencies:
+2. Instala las dependencias:
    ```bash
    npm install
    ```
 
-### Development
+## 💻 Desarrollo
 
-Start the development server:
+1. Asegúrate de que el backend FastAPI esté corriendo:
+   ```bash
+   # En el directorio raíz del proyecto
+   cd api
+   uv run python app.py
+   ```
 
-```bash
-npm run dev
-```
+2. Inicia el servidor de desarrollo del frontend:
+   ```bash
+   npm run dev
+   ```
 
-The application will be available at `http://localhost:3000`
+3. Abre tu navegador en `http://localhost:3000`
 
-### Building for Production
+## 📝 Configuración Inicial
 
-Create a production build:
+Al abrir la aplicación por primera vez, verás un panel de configuración donde debes:
+
+1. **API Key de OpenAI**: Ingresa tu clave API de OpenAI (empieza con `sk-...`)
+2. **API URL**: URL del backend (default: `http://localhost:8000/api/chat`)
+3. **Modelo**: Selecciona el modelo de OpenAI a usar:
+   - GPT-4o Mini (recomendado para desarrollo)
+   - GPT-4o
+   - GPT-4 Turbo
+   - GPT-3.5 Turbo
+4. **Mensaje del Sistema**: Define el comportamiento del asistente
+
+## 🏗️ Build para Producción
+
+Crear una build de producción:
 
 ```bash
 npm run build
 ```
 
-The built files will be in the `dist` directory.
+Los archivos compilados estarán en el directorio `dist/`.
 
-### Preview Production Build
-
-Preview the production build locally:
+### Vista Previa de Producción
 
 ```bash
 npm run preview
 ```
 
-### Linting
-
-Run ESLint to check for code quality issues:
-
-```bash
-npm run lint
-```
-
-## Project Structure
+## 📁 Estructura del Proyecto
 
 ```
-frontend/
-├── public/                 # Static assets
+chat-frontend/
 ├── src/
-│   ├── components/         # Reusable components
-│   │   └── Layout.tsx     # Main layout component
-│   ├── pages/             # Page components
-│   │   ├── Home.tsx       # Home page
-│   │   ├── About.tsx      # About page
-│   │   └── Contact.tsx    # Contact page
-│   ├── App.tsx            # Main app component
-│   ├── main.tsx           # Application entry point
-│   └── index.css          # Global styles
-├── index.html             # HTML template
-├── package.json           # Dependencies and scripts
-├── tailwind.config.js     # Tailwind configuration
-├── tsconfig.json          # TypeScript configuration
-└── vite.config.ts         # Vite configuration
+│   ├── components/
+│   │   ├── ChatInterface.tsx    # Interfaz principal de chat
+│   │   └── ConfigPanel.tsx      # Panel de configuración
+│   ├── App.tsx                  # Componente principal
+│   ├── main.tsx                 # Punto de entrada
+│   └── index.css                # Estilos globales
+├── public/                      # Archivos estáticos
+├── index.html                   # Template HTML
+├── package.json                 # Dependencias
+├── tsconfig.json               # Configuración TypeScript
+├── tailwind.config.cjs         # Configuración Tailwind
+└── vite.config.ts              # Configuración Vite
 ```
 
-## Available Scripts
+## 🔧 Scripts Disponibles
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+- `npm run dev` - Inicia servidor de desarrollo
+- `npm run build` - Build para producción
+- `npm run preview` - Vista previa de build
+- `npm run lint` - Ejecuta ESLint
 
-## Customization
+## 🔌 API Integration
 
-### Adding New Pages
+La aplicación se conecta al backend FastAPI con el siguiente flujo:
 
-1. Create a new component in `src/pages/`
-2. Add the route in `src/App.tsx`
-3. Update the navigation in `src/components/Layout.tsx`
+1. El usuario configura sus credenciales y preferencias
+2. Al enviar un mensaje, se hace un POST request a `/api/chat`
+3. La respuesta se recibe en streaming
+4. Los mensajes se muestran en tiempo real
 
-### Styling
+### Formato de Request
 
-The application uses Tailwind CSS for styling. You can:
-
-- Modify `tailwind.config.js` to customize the design system
-- Add custom styles in `src/index.css`
-- Use Tailwind utility classes in components
-
-### Adding Dependencies
-
-```bash
-npm install package-name
+```json
+{
+  "developer_message": "You are a helpful AI assistant.",
+  "user_message": "Hello, how are you?",
+  "model": "gpt-4o-mini",
+  "api_key": "sk-..."
+}
 ```
 
-For TypeScript types (if needed):
-```bash
-npm install -D @types/package-name
+## 🎨 Personalización
+
+### Cambiar Colores
+
+Edita `tailwind.config.cjs` para personalizar el tema:
+
+```javascript
+colors: {
+  primary: {
+    // Tus colores personalizados
+  }
+}
 ```
 
-## Contributing
+### Agregar Nuevos Componentes
 
-1. Make your changes
-2. Run `npm run lint` to check code quality
-3. Test your changes with `npm run dev`
-4. Build to ensure everything works: `npm run build`
+1. Crea el componente en `src/components/`
+2. Importa y usa en `App.tsx` o donde lo necesites
 
-## License
+## 🔒 Seguridad
 
-This project is part of the AI Engineer Challenge.
+- Las API keys se almacenan solo en el estado local de React (memoria del navegador)
+- No se persisten en localStorage ni se envían a ningún servidor excepto al backend configurado
+- El backend FastAPI maneja la comunicación segura con OpenAI
+
+## 🐛 Troubleshooting
+
+### El backend no responde
+
+- Verifica que el backend esté corriendo en `http://localhost:8000`
+- Revisa los logs del backend para errores
+- Confirma que CORS esté habilitado en el backend
+
+### Errores de API Key
+
+- Verifica que tu API key sea válida
+- Asegúrate de tener créditos en tu cuenta de OpenAI
+- Revisa que el modelo seleccionado esté disponible para tu cuenta
+
+### Problemas de CORS
+
+Si encuentras errores de CORS, verifica la configuración en `api/app.py`:
+
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Ajusta según necesites
+    ...
+)
+```
+
+## 📚 Recursos
+
+- [React Documentation](https://react.dev/)
+- [TypeScript Documentation](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Vite](https://vitejs.dev/)
+- [OpenAI API](https://platform.openai.com/docs)
+
+## 🤝 Contribuir
+
+1. Haz tus cambios
+2. Ejecuta `npm run lint` para verificar calidad del código
+3. Prueba con `npm run dev`
+4. Build para asegurar que todo funciona: `npm run build`
+
+## 📄 Licencia
+
+Este proyecto es parte del AI Engineer Challenge.
+
+---
+
+Desarrollado con ❤️ usando React + TypeScript + Tailwind CSS
