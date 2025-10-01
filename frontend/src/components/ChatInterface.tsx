@@ -16,6 +16,7 @@ const ChatInterface = ({ config, onReconfigure }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -25,6 +26,26 @@ const ChatInterface = ({ config, onReconfigure }: ChatInterfaceProps) => {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  useEffect(() => {
+    const checkApiHealth = async () => {
+      try {
+        const healthUrl = config.apiUrl.replace('/api/chat', '/api/health')
+        const response = await fetch(healthUrl, { method: 'GET' })
+        if (response.ok) {
+          setApiStatus('online')
+        } else {
+          setApiStatus('offline')
+        }
+      } catch (error) {
+        setApiStatus('offline')
+      }
+    }
+
+    checkApiHealth()
+    const interval = setInterval(checkApiHealth, 30000) // Check every 30 seconds
+    return () => clearInterval(interval)
+  }, [config.apiUrl])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,7 +73,8 @@ const ChatInterface = ({ config, onReconfigure }: ChatInterfaceProps) => {
       })
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorText = await response.text()
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`)
       }
 
       const reader = response.body?.getReader()
@@ -83,11 +105,19 @@ const ChatInterface = ({ config, onReconfigure }: ChatInterfaceProps) => {
       }
     } catch (error) {
       console.error('Error:', error)
+      let errorMessage = 'Error desconocido'
+      
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        errorMessage = `No se puede conectar al servidor API en ${config.apiUrl}.\n\nPosibles soluciones:\n1. Verifica que el backend esté corriendo (python api/app.py o uvicorn api.app:app)\n2. Confirma que la URL del API sea correcta\n3. Revisa que el puerto sea el correcto (por defecto: 8000)`
+      } else if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      
       setMessages(prev => [
         ...prev,
         {
           role: 'assistant',
-          content: `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`
+          content: `❌ Error: ${errorMessage}`
         }
       ])
     } finally {
@@ -107,7 +137,22 @@ const ChatInterface = ({ config, onReconfigure }: ChatInterfaceProps) => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Chat con OpenAI</h1>
-                <p className="text-sm text-gray-500">Modelo: {config.model}</p>
+                <div className="flex items-center space-x-3">
+                  <p className="text-sm text-gray-500">Modelo: {config.model}</p>
+                  <div className="flex items-center space-x-1">
+                    <div className={`w-2 h-2 rounded-full ${
+                      apiStatus === 'online' ? 'bg-green-500' : 
+                      apiStatus === 'offline' ? 'bg-red-500' : 'bg-yellow-500'
+                    }`} />
+                    <span className={`text-xs ${
+                      apiStatus === 'online' ? 'text-green-600' : 
+                      apiStatus === 'offline' ? 'text-red-600' : 'text-yellow-600'
+                    }`}>
+                      {apiStatus === 'online' ? 'API Conectada' : 
+                       apiStatus === 'offline' ? 'API Desconectada' : 'Verificando...'}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
             <button
